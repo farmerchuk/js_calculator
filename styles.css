@@ -66,3 +66,7 @@ body {
 #buttons > div:nth-of-type(4n) {
   margin-right: 0;
 }
+
+#buttons > div.pressed {
+  background: #565656;
+}
