@@ -29,73 +29,20 @@ var calculator = {
   processInput: function(input) {
     if (this.isNumerical(input)) {
       this.addNumberToRegister(input);
-      this.renderRegister();
     } else if (this.isOperator(input)) {
       this.processOperator(input);
-      this.renderResult();
-      this.renderInputHistory();
     } else if (this.isEquals(input)) {
       this.processEquals();
       this.clearInputHistory();
-      this.renderResult();
-      this.renderInputHistory();
     } else if (this.isC(input)) {
       this.processClear();
-      this.renderResult();
-      this.renderInputHistory();
     } else if (this.isCe(input)) {
-      this.processCe();
-      this.renderRegister();
+      this.processClearEntry();
     } else if (this.isNeg(input)) {
       this.processNeg();
     }
-  },
 
-  isNumerical: function(input) {
-    return !!input.match(/[0-9\.]/);
-  },
-
-  addNumberToRegister: function(input) {
-    if (this.register.match(/[\.]/) && input === '.') {
-      // Ignore extra decimals
-    } else {
-      this.register += input;
-    }
-  },
-
-  renderRegister: function() {
-    var displayValue = this.register.slice(0, 15) || '0';
-    $('#register').html(displayValue);
-  },
-
-  renderResult: function() {
-    var displayValue = this.result.slice(0, 15) || '0';
-    $('#register').html(displayValue);
-  },
-
-  renderInputHistory: function() {
-    var displayValue = this.inputHistory;
-    $('#history').html(displayValue);
-  },
-
-  isOperator: function(input) {
-    return !!input.match(/[\+\-\*\/]/);
-  },
-
-  addRegisterToInputHistory: function() {
-    this.inputHistory += this.register + ' ';
-  },
-
-  addResultToInputHistory: function() {
-    this.inputHistory += this.result + ' ';
-  },
-
-  addOperatorToInputHistory: function(input) {
-    this.inputHistory += input + ' ';
-  },
-
-  clearInputHistory: function() {
-    this.inputHistory = '';
+    this.renderScreen();
   },
 
   processOperator: function(input) {
@@ -118,11 +65,21 @@ var calculator = {
       this.addOperatorToInputHistory(input);
       this.moveRegisterToResult();
     }
+
     this.clearRegister();
   },
 
-  isEquals: function(input) {
-    return input === '=';
+  processOperation() {
+    var operand1 = Number(this.result);
+    var operand2 = Number(this.register);
+    var result;
+
+    if (this.operator === '+') result = operand1 + operand2;
+    if (this.operator === '-') result = operand1 - operand2;
+    if (this.operator === '*') result = operand1 * operand2;
+    if (this.operator === '/') result = operand1 / operand2;
+
+    this.result = String(result);
   },
 
   processEquals: function() {
@@ -133,10 +90,6 @@ var calculator = {
     }
   },
 
-  isC: function(input) {
-    return input === 'c';
-  },
-
   processClear: function() {
     this.clearOperator();
     this.clearRegister();
@@ -144,16 +97,8 @@ var calculator = {
     this.clearInputHistory();
   },
 
-  isCe: function(input) {
-    return input === 'ce';
-  },
-
-  processCe: function() {
+  processClearEntry: function() {
     this.clearRegister();
-  },
-
-  isNeg: function(input) {
-    return input === 'neg';
   },
 
   processNeg: function() {
@@ -174,12 +119,68 @@ var calculator = {
     }
   },
 
-  setOperator: function(input) {
-    this.operator = input;
+  renderScreen: function() {
+    this.register ? this.renderRegister() : this.renderResult();
+    this.renderInputHistory();
   },
 
-  clearOperator: function() {
-    this.operator = '';
+  renderRegister: function() {
+    var displayValue = this.register.slice(0, 15) || '0';
+    $('#register').html(displayValue);
+  },
+
+  renderResult: function() {
+    var displayValue = this.result.slice(0, 15) || '0';
+    $('#register').html(displayValue);
+  },
+
+  renderInputHistory: function() {
+    var displayValue = this.inputHistory;
+    $('#history').html(displayValue);
+  },
+
+  isNumerical: function(input) {
+    return !!input.match(/[0-9\.]/);
+  },
+
+  isOperator: function(input) {
+    return !!input.match(/[\+\-\*\/]/);
+  },
+
+  isEquals: function(input) {
+    return input === '=';
+  },
+
+  isC: function(input) {
+    return input === 'c';
+  },
+
+  isCe: function(input) {
+    return input === 'ce';
+  },
+
+  isNeg: function(input) {
+    return input === 'neg';
+  },
+
+  addNumberToRegister: function(input) {
+    if (this.register.match(/[\.]/) && input === '.') {
+      // Ignore extra decimals
+    } else {
+      this.register += input;
+    }
+  },
+
+  addRegisterToInputHistory: function() {
+    this.inputHistory += this.register + ' ';
+  },
+
+  addResultToInputHistory: function() {
+    this.inputHistory += this.result + ' ';
+  },
+
+  addOperatorToInputHistory: function(input) {
+    this.inputHistory += input + ' ';
   },
 
   moveRegisterToResult: function() {
@@ -190,6 +191,10 @@ var calculator = {
     this.register = this.result;
   },
 
+  setOperator: function(input) {
+    this.operator = input;
+  },
+
   clearRegister: function() {
     this.register = '';
   },
@@ -198,17 +203,12 @@ var calculator = {
     this.result = '';
   },
 
-  processOperation() {
-    var operand1 = Number(this.result);
-    var operand2 = Number(this.register);
-    var result;
+  clearOperator: function() {
+    this.operator = '';
+  },
 
-    if (this.operator === '+') result = operand1 + operand2;
-    if (this.operator === '-') result = operand1 - operand2;
-    if (this.operator === '*') result = operand1 * operand2;
-    if (this.operator === '/') result = operand1 / operand2;
-
-    this.result = String(result);
+  clearInputHistory: function() {
+    this.inputHistory = '';
   },
 
   init: function() {
